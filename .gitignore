@@ -1,0 +1,20 @@
+# Variables de entorno
+.env
+
+# Entornos virtuales (nunca se suben)
+venv/
+.venv/
+env/
+.env.local
+
+# Bases de datos y carpetas temporales
+__pycache__/
+*.pyc
+*.db
+*.sqlite3
+
+# Archivos de sistema
+.DS_Store
+
+# Carpeta de migraciones
+migrations/
