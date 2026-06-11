@@ -1,6 +1,6 @@
 # Variables de entorno
 .env
-
+.devcontainer/.env
 # Entornos virtuales (nunca se suben)
 venv/
 .venv/
