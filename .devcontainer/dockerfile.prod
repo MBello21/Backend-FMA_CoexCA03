@@ -1,0 +1,18 @@
+FROM python:3.14-slim
+
+WORKDIR /app
+
+RUN pip install pipenv
+
+COPY Pipfile Pipfile.lock ./
+
+RUN pipenv install --deploy --ignore-pipfile
+
+COPY . .
+
+ENV FLASK_APP=src/app.py
+ENV FLASK_ENV=production
+
+EXPOSE 5000
+
+CMD ["pipenv", "run", "flask", "run", "--host=0.0.0.0"]
