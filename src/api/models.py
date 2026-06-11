@@ -8,7 +8,7 @@ class Meteorological(db.Model):
     freak: Mapped[str] = mapped_column(String(120), nullable=False)
     cat: Mapped[str] = mapped_column(String(120), nullable=False)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
-    recommendation_list: Mapped[list["Recommendation"]] = relationship(back_populates="freak")
+    recommendation_list: Mapped[list["Recommendation"]] = relationship(back_populates="freak", cascade="all, delete-orphan")
     
     def serialize(self): 
         return {
