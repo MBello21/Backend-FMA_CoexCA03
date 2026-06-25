@@ -16,5 +16,3 @@ __pycache__/
 # Archivos de sistema
 .DS_Store
 
-# Carpeta de migraciones
-migrations/

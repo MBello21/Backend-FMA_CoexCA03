@@ -1,16 +1,18 @@
 services:
   app:
     build:
-      context: .
-      dockerfile: dockerfile.prod
+      context: /opt/Backend-FMA_CoexCA03
+      dockerfile: .devcontainer/dockerfile.prod
     command: >
-      sh -c "pipenv run flask db upgrade &&
+      sh -c "wait-for-it db:5432 --timeout=30 &&
+             pipenv run flask db upgrade &&
              pipenv run flask run --host=0.0.0.0"
     environment:
       FLASK_APP: src/app.py
       FLASK_ENV: production
       DATABASE_URL: ${DATABASE_URL}
-    network_mode: service:db
+    networks:
+      - backend
     depends_on:
       - db
 
@@ -25,6 +27,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    networks:
+      - backend
 
 volumes:
   postgres-data:
+networks:
+  backend:
