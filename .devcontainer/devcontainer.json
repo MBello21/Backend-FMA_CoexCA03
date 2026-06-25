@@ -25,5 +25,10 @@
             ]
         }
     },
-    "remoteUser": "vscode"
+    "remoteUser": "vscode",
+    "portsAttributes": {
+        "5000": {
+            "label": ""
+        }
+    }
 }

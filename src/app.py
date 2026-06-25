@@ -3,6 +3,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from api.models import db
 from api.routes import api
+from flask_cors import CORS
 
 
 ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
@@ -10,6 +11,8 @@ static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 
 app = Flask(__name__)
+
+CORS(app)
 
 db_url = os.getenv("DATABASE_URL")
 
