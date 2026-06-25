@@ -16,6 +16,7 @@
 
     "forwardPorts": [3000,3001],
     "onCreateCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && (cp .env.example .env || echo \".env creation failed\"); (pipenv install || echo \"pipenv install failed\"); (bash  database.sh || echo \"database.sh failed\");",
+    // Corregido: ejecutamos tu script de bienvenida limpio sin el apt install fantasma
     "postCreateCommand": "python docs/assets/greeting.py both || echo 'Greeting script skipped'",
     "customizations": {
         "vscode": {
@@ -25,5 +26,10 @@
             ]
         }
     },
-    "remoteUser": "vscode"
+    "remoteUser": "vscode",
+    "portsAttributes": {
+        "5000": {
+            "label": ""
+        }
+    }
 }
