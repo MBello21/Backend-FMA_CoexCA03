@@ -26,6 +26,10 @@
             ]
         }
     },
-    // Recuerda que la imagen base usa el usuario 'vscode'
-    "remoteUser": "vscode"
+    "remoteUser": "vscode",
+    "portsAttributes": {
+        "5000": {
+            "label": ""
+        }
+    }
 }
