@@ -1,8 +1,6 @@
-import os 
-from flask import Flask, request, jsonify, url_for, send_from_directory
+import os
+from flask import Flask
 from flask_migrate import Migrate
-from flask_swagger import swagger
-from datetime import timedelta
 from api.models import db
 from api.routes import api
 
@@ -15,7 +13,7 @@ app = Flask(__name__)
 
 db_url = os.getenv("DATABASE_URL")
 
-if db_url is not None: 
+if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
         'postgres://', 'postgresql://')
 else:
