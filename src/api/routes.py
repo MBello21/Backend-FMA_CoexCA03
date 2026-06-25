@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-
 from sqlalchemy import select, func
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from api.models import db, Meteorological, Recommendation, Users
 
 api = Blueprint('api', __name__)
@@ -15,8 +15,8 @@ def get_health():
 def signup():
     data = request.get_json()
 
-    required_files = ['firstname', 'lastname', 'email', 'category', 'password']
-    missing = [req for req in required_files if not data.get(req)]
+    required_field = ['firstname', 'lastname', 'email', 'category', 'password']
+    missing = [req for req in required_field if not data.get(req)]
 
     if missing:
         return jsonify({'error': 'All fields are required'}), 400
@@ -38,6 +38,42 @@ def signup():
     db.session.commit()
 
     return jsonify({'msg': 'User created succesfully'}), 200
+
+
+@api.route('/signin', methods=['POST'])
+def signin():
+    data = request.get_json()
+
+    required_field = ['email', 'password']
+    missing = [req for req in required_field if not data.get(req)]
+
+    if missing:
+        return jsonify({'error': 'All fields are required'}), 400
+
+    user = db.session.execute(select(Users).where(
+        Users.email == data.get('email'))).scalar_one_or_none()
+
+    if user is None:
+        return jsonify({'error': 'User does not exist'}), 400
+
+    if user.check_password(data.get('password')):
+        access_token = create_access_token(identity=str(user.id))
+        return jsonify({'msg': 'Login success',
+                        'token': access_token})
+    else:
+        return jsonify({'error': 'Invalid user or password'}), 401
+
+
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user():
+    user_id = get_jwt_identity()
+    user = db.session.execute(select(Users).where(
+        Users.id == int(user_id))).scalar_one_or_none()
+
+    if not user:
+        return jsonify({'error': 'Not found'}), 404
+    return jsonify(user.serialize()), 200
 
 
 @api.route('/recommendations/<freak>', methods=['GET'])
