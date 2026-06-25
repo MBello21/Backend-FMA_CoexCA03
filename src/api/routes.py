@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
-
 from sqlalchemy import select, func
 from api.models import db, Meteorological, Recommendation, Users
+
 
 api = Blueprint('api', __name__)
 

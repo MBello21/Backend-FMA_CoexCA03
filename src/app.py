@@ -14,6 +14,9 @@ app = Flask(__name__)
 
 CORS(app)
 
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')  # Change this!
+jwt = JWTManager(app)
+
 db_url = os.getenv("DATABASE_URL")
 
 if db_url is not None:
