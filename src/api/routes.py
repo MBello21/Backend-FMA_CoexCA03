@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, url_for, Blueprint, current_app
 from sqlalchemy import select, func
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
-from api.models import db, Meteorological, Recommendation, Users
+from api.models import db, Meteorological, Recommendation, Users, WorkRecommendation
 
 
 api = Blueprint('api', __name__)
@@ -77,13 +77,24 @@ def get_user():
     return jsonify(user.serialize()), 200
 
 
-@api.route('/recommendations/<freak>', methods=['GET'])
-def get_temperature(freak):
-    result = Meteorological.query.filter_by(freak=freak).all()
+@api.route('/recommendations', methods=['GET'])
+@jwt_required()
+def get_recommendations():
+    result = Meteorological.query.all()
     return jsonify([f.serialize() for f in result]), 200
 
 
+@api.route('/freak/<int:id>', methods=['GET'])
+def get_freak(id):
+    result = db.session.execute(select(
+        Meteorological).where(Meteorological.id == id)).scalar_one_or_none()
+    if not result:
+        return jsonify({'error': 'Freak not found'}), 404
+    return jsonify(result.serialize()), 200
+
+
 @api.route('/recommendations', methods=['POST'])
+@jwt_required()
 def post_temperature():
     data = request.get_json()
 
@@ -97,6 +108,8 @@ def post_temperature():
         return jsonify({'error': 'All fields are required'}), 400
 
     recommendations = data.get("recommendation_list")
+    work_recommendations = data.get("work_recommendation_list", [])
+    prohibition_recommendations = data.get("prohibition_list", [])
     new_meteorological = Meteorological(
         freak=data.get("freak", "temperatura"),
         cat=data.get("cat"),
@@ -112,6 +125,20 @@ def post_temperature():
             recommendation=recommendation
         )
         db.session.add(new_recommendation)
+    for recommendation in work_recommendations:
+        new_work_recommendation = WorkRecommendation(
+            freak_id=new_meteorological.id,
+            type='precaucion',
+            work_recommendation=recommendation
+        )
+        db.session.add(new_work_recommendation)
+    for recommendation in prohibition_recommendations:
+        new_prohibition_recommendations = WorkRecommendation(
+            freak_id=new_meteorological.id,
+            type='prohibicion',
+            work_recommendation=recommendation
+        )
+        db.session.add(new_prohibition_recommendations)
     db.session.commit()
 
     return jsonify({
@@ -121,6 +148,7 @@ def post_temperature():
 
 
 @api.route('/freak/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_freak(id):
     freak = Meteorological.query.get(id)
 
@@ -133,6 +161,7 @@ def delete_freak(id):
 
 
 @api.route("/recommendation/<int:id>", methods=["PATCH"])
+@jwt_required()
 def patch_recommendation(id):
     data = request.get_json()
 
@@ -153,6 +182,7 @@ def patch_recommendation(id):
 
 
 @api.route('/recommendation/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_recommendation(id):
     recommendation = Recommendation.query.get(id)
 
